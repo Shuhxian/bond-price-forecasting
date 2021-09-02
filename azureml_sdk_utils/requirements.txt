@@ -1,0 +1,4 @@
+azureml-sdk
+xlrd
+openpyxl
+azureml-widgets
