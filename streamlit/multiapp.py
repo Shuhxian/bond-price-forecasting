@@ -39,8 +39,9 @@ class MultiApp:
         })
 
     def run(self):
-        app = st.sidebar.radio(
-            'Go To',
+        st.markdown('## Go To', unsafe_allow_html=True)
+        app = st.selectbox(
+            '',
             self.apps,
             format_func=lambda app: app['title'])
 

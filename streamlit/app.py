@@ -4,7 +4,7 @@ from pages import dashboard, dataset_page, model_page, portfolio # import your a
 
 app = MultiApp()
 
-st.sidebar.title('GigaBITS')
+st.title('GigaBITS')
 
 # Add all your application here
 app.add_app("Dashboard", dashboard.app)
