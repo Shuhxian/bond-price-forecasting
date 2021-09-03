@@ -33,17 +33,13 @@ amlcompute_cluster_name = "GigaBITS-compute"
 COMPUTE_TARGET = ComputeTarget(workspace=WS, name=amlcompute_cluster_name)
 
 # upload dataset
-def upload_dataset(excel_file):
-    filename, file_extension = os.path.splitext(excel_file)
-    # convert excel to csv
-    if file_extension == ".xlsx":
-        pd.read_excel(excel_file,  engine='openpyxl').to_csv(filename +".csv")
-
+def upload_dataset(filename, df):
+    df.to_csv(filename +".csv")
     datastore = WS.get_default_datastore()
     datastore.upload_files(files = [filename +".csv"], target_path = 'dataset/', overwrite = True,show_progress = True)
     dataset = Dataset.Tabular.from_delimited_files(path=datastore.path('dataset/'+filename +".csv"))
     dataset = dataset.register(workspace=WS,
-                                 name='dataset',
+                                 name=filename,
                                  description='testing',
                                  create_new_version = True)
 
