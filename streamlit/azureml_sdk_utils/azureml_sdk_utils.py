@@ -26,7 +26,7 @@ SVC_PR = ServicePrincipalAuthentication(
     service_principal_password="eE.ozUaf8ncZt8~5gID-A7X85g.7clQ.P6")
 
 # define workspace
-WS = Workspace.from_config("config.json", auth=SVC_PR)
+WS = Workspace.from_config("streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
 
 # define a compute_cluster
 amlcompute_cluster_name = "GigaBITS-compute"
@@ -51,6 +51,10 @@ def upload_dataset(excel_file):
 def show_all_registered_datasets():
     return Dataset.get_all(WS)
     
+# select a dataset and convert it to pandas dataframe
+def select_dataset(dataset_name):
+    return Dataset.get_by_name(WS, dataset_name, version='latest').to_pandas_dataframe().reset_index(drop=True)
+
 # feature selection
 def manual_feature_selection(dataset_df, dropped_columns):
     return dataset_df.drop(dropped_columns)
@@ -84,23 +88,21 @@ def auto_feature_selection(dataset_df, method, k, target_column_name, show_disca
     if method=="Extra_Trees":
         feature_list=list(selector.feature_importances_)
         for i in range(len(feature_list)):
-        if feature_list[i]>0.01/k:
-            cols.append(i)
+            if feature_list[i]>0.01/k:
+                cols.append(i)
     else:
         cols = selector.get_support(indices=True)
     if show_discard:
         discarded=set(dataset_df.columns)-set(dataset_df.iloc[:,cols].columns)
         for discard in discarded:
-        print(discard)
+            print(discard)
 
     return dataset_df.iloc[:,cols+[target_column_name]]
 
-# train a model
-def train_model(dataset_name, experiment_name, time_column_name, time_series_id_column_names, target_column_name, experiment_timeout_hours=24):
+# train a model on the cloud only 
+def train_model(dataset_df, experiment_name, time_column_name, time_series_id_column_names, target_column_name, experiment_timeout_hours=24):
     # create or retrieve experiment
     experiment = Experiment(WS, experiment_name)
-    # get a registered dataset
-    dataset = Dataset.get_by_name(WS, dataset_name, version='latest')
     forecasting_parameters = ForecastingParameters(
         time_column_name=time_column_name,
         forecast_horizon=1, # forecast 1 month ahead only
@@ -109,15 +111,17 @@ def train_model(dataset_name, experiment_name, time_column_name, time_series_id_
     )
 
     automl_config = AutoMLConfig(task='forecasting',
+                                enable_dnn=True,
                                 primary_metric='normalized_root_mean_squared_error',
                                 experiment_timeout_hours=experiment_timeout_hours,
-                                training_data=dataset,
+                                training_data=dataset_df,
                                 label_column_name=target_column_name,
                                 compute_target=COMPUTE_TARGET,
                                 enable_early_stopping=True,
                                 featurization="auto",
-                                n_cross_validations=5,
+                                n_cross_validations=3,
                                 verbosity=logging.INFO,
+                                max_concurrent_iterations=2,
                                 max_cores_per_iteration=-1,
                                 forecasting_parameters=forecasting_parameters)
     
@@ -132,4 +136,4 @@ def train_model(dataset_name, experiment_name, time_column_name, time_series_id_
 
 # upload_dataset("dataset_31082021.xlsx")
 # print(show_all_registered_datasets())
-best_run, fitted_model = train_model("dataset", "test", "VALUE DATE MONTH", "STOCK CODE", "NEXT MONTH CHANGES IN EVAL MID PRICE")
+# best_run, fitted_model = train_model("dataset", "test", "VALUE DATE MONTH", "STOCK CODE", "NEXT MONTH CHANGES IN EVAL MID PRICE")

@@ -1,0 +1,5 @@
+azureml-sdk
+xlrd
+openpyxl
+azureml-widgets
+scikit-learn
