@@ -6,14 +6,18 @@ import numpy as np
   
 # setting path
 sys.path.append('..\\azureml_sdk_utils')
+from azureml_sdk_utils.azureml_sdk_utils import *
 
 def app():
     st.title('Dataset')
     st.markdown("## Original Dataset")
+    view_original = st.button('View original dataset')
     # Getting and displaying the original dataset from AML
-    dataset_name = "dataset"
-    original_dataset = select_dataset(dataset_name)
-    st.dataframe(original_dataset.head())
+    if view_original:
+        # Fetching the dataset from AML takes quite a bit of time
+        dataset_name = "Extra_Trees_new"
+        original_dataset = select_dataset(dataset_name)
+        st.dataframe(original_dataset.head())
 
     # Upload the dataset and save it to Azure
     st.markdown("## Data Upload")
