@@ -1,5 +1,5 @@
 [server]
-runOnSave = true
+runOnSave = false
 
 [theme]
 primaryColor = "#7FC1DB" # blue
