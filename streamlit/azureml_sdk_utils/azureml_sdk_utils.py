@@ -32,8 +32,8 @@ SVC_PR = ServicePrincipalAuthentication(
     service_principal_password="eE.ozUaf8ncZt8~5gID-A7X85g.7clQ.P6")
 
 # define workspace
-#WS = Workspace.from_config("streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
-WS = Workspace.from_config("azureml_sdk_utils/config.json", auth=SVC_PR)
+WS = Workspace.from_config("streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
+# WS = Workspace.from_config("azureml_sdk_utils/config.json", auth=SVC_PR)
 
 # define a compute_cluster
 amlcompute_cluster_name = "GigaBITS-compute"
@@ -127,9 +127,9 @@ def select_registered_model(model_name):
     return Model(WS, model_name)
 
 # select the best model from an experiment
-def select_best_model(experiment, run_id):
+def select_best_model(experiment, run_id, metric="root_mean_squared_error"):
     automl_run = AutoMLRun(experiment, run_id = run_id)
-    best_run, fitted_model = automl_run.get_output()
+    best_run, fitted_model = automl_run.get_output(metric=metric)
     print(fitted_model.steps)
     return fitted_model
 
@@ -184,3 +184,6 @@ def train_model(dataset_df, experiment_name, time_column_name, time_series_id_co
     # https://github.com/Azure/MachineLearningNotebooks/blob/master/how-to-use-azureml/automated-machine-learning/local-run-classification-credit-card-fraud/auto-ml-classification-credit-card-fraud-local.ipynb
     remote_run.wait_for_completion()
     return remote_run.get_output()
+
+
+# select_best_model(select_experiment("benchmark_bond_price_forecasting"),"AutoML_08ea42b8-539c-43f3-812d-7a2ece99d475")
