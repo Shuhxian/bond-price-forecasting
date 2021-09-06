@@ -1,6 +1,0 @@
-azureml-sdk
-xlrd
-openpyxl
-azureml-widgets
-scikit-learn
-azureml-train-automl-runtime

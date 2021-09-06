@@ -55,8 +55,12 @@ def show_all_registered_datasets():
     return Dataset.get_all(WS)
     
 # select a dataset and convert it to pandas dataframe
-def select_dataset(dataset_name):
-    return Dataset.get_by_name(WS, dataset_name, version='latest').to_pandas_dataframe().reset_index(drop=True)
+def select_dataset(dataset_name, to_pandas_dataframe = True):
+    dataset = Dataset.get_by_name(WS, dataset_name, version='latest')
+    if to_pandas_dataframe:
+        return dataset.to_pandas_dataframe().reset_index(drop=True)
+    else:
+        return dataset
 
 # feature selection
 def manual_feature_selection(dataset_df, dropped_columns):
@@ -74,13 +78,13 @@ def auto_feature_selection(dataset_df, method, k, target_column_name, show_disca
     show_discard: bool
     Whether to print out the discarded features.
     """
-    X = dataset_df.drop([target_column_name])
+    X = dataset_df.drop(columns = [target_column_name])
     Y = dataset_df[[target_column_name]]
     if method=="K_Best":
         selector = SelectKBest(score_func=f_classif, k=k)
     elif method=="RFE":
         model = LinearRegression()
-        selector = RFE(model, k=k)
+        selector = RFE(model, n_features_to_select=k)
     elif method=="Extra_Trees":
         selector = ExtraTreesRegressor(n_estimators=100)
     else:
@@ -100,7 +104,7 @@ def auto_feature_selection(dataset_df, method, k, target_column_name, show_disca
         for discard in discarded:
             print(discard)
 
-    return dataset_df.iloc[:,cols+[target_column_name]]
+    return cols+[target_column_name]
 
 # show a list of experiments
 def show_all_experiments():
@@ -186,4 +190,7 @@ def train_model(dataset_df, experiment_name, time_column_name, time_series_id_co
     return remote_run.get_output()
 
 
-# select_best_model(select_experiment("benchmark_bond_price_forecasting"),"AutoML_08ea42b8-539c-43f3-812d-7a2ece99d475")
+# select_best_model(select_experiment("benchmark_bond_price_forecasting"),"AutoML_be919576-4584-4c93-a89c-91d9b7626971")
+# print(list(show_all_registered_datasets().keys()))
+# print(type(select_dataset("train_dataset_06092021", to_pandas_dataframe = False)))
+# print(show_all_experiments())

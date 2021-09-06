@@ -6,3 +6,5 @@ etc/
 share/
 __pycache__/
 venv/
+automl.log
+azureml_automl.log

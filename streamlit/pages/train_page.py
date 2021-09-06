@@ -12,41 +12,41 @@ from azureml_sdk_utils.azureml_sdk_utils import *
 def app():
     st.title('Train New Model')
 
-    ''' Upload the new dataset and save it to Azure '''
-    st.markdown("## Data Upload")
-    st.markdown("### Upload a new dataset for training.") 
-    st.write("\n")
+    ''' Allowing the user to select a dataset from Azure Datastore '''
+    all_registered_datasets = list(show_all_registered_datasets().keys())
+    selected_dataset_name = st.selectbox("Choose a dataset from Azure Datastore", all_registered_datasets, index=0)
+    selected_dataset_df = select_dataset(selected_dataset_name)
 
-    uploaded_file = st.file_uploader("Choose a file", type=["xlsx","csv"])
-    if uploaded_file is not None:
-        filename, file_extension = os.path.splitext(uploaded_file.name)
-        if file_extension == "xlsx":
-            df = pd.read_excel(uploaded_file,  engine='openpyxl')
-        else:
-            df = pd.read_csv(uploaded_file)
-        def upload_this_dataset():
-            upload_dataset(filename, df)
-    
-        st.markdown("## New Dataset")
-        st.dataframe(df.head())
-        st.button("Upload to Azure", on_click=upload_this_dataset)
-
-    # For debugging purposes
-    # st.table(pd.DataFrame(list(show_all_registered_datasets()), columns=["Dataset"]))
-    # for dataset_name, dataset_file in Dataset.get_all(WS).items():
+    ''' Allowing the user to select features to train on '''
+    with st.expander("Featurization"):
+        clicked = st.button("Auto Feature Selection")
+        selected_features = []
+        if clicked:
+            selected_features = auto_feature_selection(selected_dataset_df, "RFE", 10, "NEXT MONTH CHANGES IN EVAL MID PRICE", show_discard=False)
+        checked_box = {}
+        for i, col in enumerate(selected_dataset_df.columns):
+            selected = True
+            if i % 2 == 0:
+                cols = st.columns(2)
+            if col not in selected_features and len(selected_features) != 0:
+                selected = False
+            checked_box[col] = cols[i % 2].checkbox(col, value=selected, key=col)
 
     ''' Allowing the user to enter and select certain parameters '''
     with st.form(key='training_parameters'):
         experiment_name = st.text_input(label='Experiment name')
-        time_column_name = st.text_input(label='Time column name')
-        time_series_id_column_names = st.text_input(label='Time series id column name')
-        target_column_name = st.text_input(label='Target column name')
+        time_column_name = st.selectbox("Time column name", selected_dataset_df.columns, index=0)
+        time_series_id_column_names = st.selectbox("Time series id column name", selected_dataset_df.columns, index=0)
+        target_column_name = st.selectbox("Target column name", selected_dataset_df.columns, index=0)
         experiment_timeout = st.slider('hours', min_value=1, max_value=24)
         submit_button = st.form_submit_button(label='Start training')
 
     ''' Show training process '''
     if submit_button:
-        #train_model(df, experiment_name, time_column_name, time_series_id_column_names, target_column_name, experiment_timeout_hours=experiment_timeout)
+        allowed_features = [feature_col for feature_col, allowed in checked_box.items() if allowed]
+        tabular_dataset = select_dataset(selected_dataset_name, to_pandas_dataframe=False)
+        tabular_dataset = tabular_dataset.keep_columns(allowed_features)
+        train_model(tabular_dataset, experiment_name, time_column_name, time_series_id_column_names, target_column_name, experiment_timeout_hours=experiment_timeout)
 
         # Progress bar sample
         training_text = st.empty()
@@ -92,3 +92,4 @@ def app():
                 y='f(x)'
             )
             st.altair_chart(chart, use_container_width=True)
+
