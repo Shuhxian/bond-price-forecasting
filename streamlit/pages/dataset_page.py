@@ -29,9 +29,8 @@ def app():
         st.button("Upload to Azure", on_click=upload_this_dataset)
 
     ''' Allowing the user to select a dataset from Azure Datastore '''
-    all_registered_datasets = show_all_registered_datasets()
-    selected_dataset_name = st.selectbox("Choose a dataset from Azure Datastore", list(all_registered_datasets.keys()), index=0)
-    selected_dataset_df = select_dataset(selected_dataset_name, all_registered_datasets)
+    selected_dataset_name = st.selectbox("Choose a dataset from Azure Datastore", list(ALL_REGISTERED_DATASETS.keys()), index=0)
+    selected_dataset_df = select_dataset(selected_dataset_name, ALL_REGISTERED_DATASETS)
     st.dataframe(selected_dataset_df.head(n=20))
 
     # Getting and displaying the original dataset from AML

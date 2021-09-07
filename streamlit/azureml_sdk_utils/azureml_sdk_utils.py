@@ -44,6 +44,9 @@ WS = Workspace.from_config("streamlit/azureml_sdk_utils/config.json", auth=SVC_P
 amlcompute_cluster_name = "GigaBITS-compute"
 COMPUTE_TARGET = ComputeTarget(workspace=WS, name=amlcompute_cluster_name)
 
+# load all dataset in first run
+ALL_REGISTERED_DATASETS = dict(Dataset.get_all(WS))
+
 # upload dataset
 def upload_dataset(filename, df):
     df.to_csv(filename +".csv")
@@ -54,17 +57,17 @@ def upload_dataset(filename, df):
                                  name=filename,
                                  description='testing',
                                  create_new_version = True)
-
-# show all dataset names
-# @st.cache(suppress_st_warning=True, hash_funcs={tuple: id})
-def show_all_registered_datasets():
-    return Dataset.get_all(WS)
-    
+  
 # select a dataset and convert it to pandas dataframe
 # @st.cache(suppress_st_warning=True, hash_funcs={tuple: id})
 def select_dataset(dataset_name, all_datasets, to_pandas_dataframe = True):
     if to_pandas_dataframe:
-        return all_datasets[dataset_name].take(10).to_pandas_dataframe().reset_index(drop=True)
+        # print(type(all_datasets[dataset_name]))
+        if isinstance(all_datasets[dataset_name], pd.DataFrame):
+            # print("cache")
+            return all_datasets[dataset_name]
+        all_datasets[dataset_name] = all_datasets[dataset_name].take(10).to_pandas_dataframe().reset_index(drop=True)
+        return all_datasets[dataset_name]
     else:
         return all_datasets[dataset_name]
 
