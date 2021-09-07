@@ -5,6 +5,7 @@ import os
 import numpy as np
 import queue
 import _thread
+import re
 
 from azureml.core.workspace import Workspace
 from azureml.core.experiment import Experiment
@@ -196,6 +197,24 @@ def train_model(dataset_df, experiment_name, time_column_name, time_series_id_co
     # https://github.com/Azure/MachineLearningNotebooks/blob/master/how-to-use-azureml/automated-machine-learning/local-run-classification-credit-card-fraud/auto-ml-classification-credit-card-fraud-local.ipynb
     remote_run.wait_for_completion()
     return remote_run.get_output()
+
+def model_loss(experiment_name,run_id):
+    """
+    Returns a dict of model with their root mean squared error.
+    """
+    experiment_test=select_experiment(experiment_name)
+    run=Run(experiment_test, run_id)
+    model_list=run.get_children(recursive=True, tags=None, properties=None, type=None, status=None, _rehydrate_runs=True)
+    model_dict={}
+    for model in model_list:
+      metric=model.get_metrics()
+      if metric:
+        if 'root_mean_squared_error' in metric:
+          model_name=re.findall('"class_name":"(.*)","module"',model.properties['pipeline_spec'])[0]
+          model_loss=metric['root_mean_squared_error']
+          if len(model_name)!=0:
+            model_dict[model_name]=model_loss
+    return model_dict
 
 
 # select_best_model(select_experiment("benchmark_bond_price_forecasting"),"AutoML_be919576-4584-4c93-a89c-91d9b7626971")
