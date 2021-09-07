@@ -3,6 +3,8 @@ import pandas as pd
 import logging
 import os
 import numpy as np
+import queue
+import _thread
 
 from azureml.core.workspace import Workspace
 from azureml.core.experiment import Experiment
@@ -24,6 +26,8 @@ from sklearn.linear_model import LinearRegression
 from sklearn.ensemble import ExtraTreesRegressor
 from sklearn.metrics import mean_squared_error
 from math import sqrt
+
+import streamlit as st
 
 # get auth code
 SVC_PR = ServicePrincipalAuthentication(
@@ -50,11 +54,15 @@ def upload_dataset(filename, df):
                                  description='testing',
                                  create_new_version = True)
 
-# show all dataset
+# show all dataset names
+# @st.cache(suppress_st_warning=True, hash_funcs={queue.SimpleQueue: id})
+# @st.cache()
 def show_all_registered_datasets():
-    return Dataset.get_all(WS)
+    return list(Dataset.get_all(WS).key())
     
 # select a dataset and convert it to pandas dataframe
+# @st.cache(suppress_st_warning=True, hash_funcs={queue.SimpleQueue: id})
+# @st.cache()
 def select_dataset(dataset_name, to_pandas_dataframe = True):
     dataset = Dataset.get_by_name(WS, dataset_name, version='latest')
     if to_pandas_dataframe:

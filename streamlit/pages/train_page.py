@@ -13,7 +13,7 @@ def app():
     st.title('Train New Model')
 
     ''' Allowing the user to select a dataset from Azure Datastore '''
-    all_registered_datasets = list(show_all_registered_datasets().keys())
+    all_registered_datasets = show_all_registered_datasets()
     selected_dataset_name = st.selectbox("Choose a dataset from Azure Datastore", all_registered_datasets, index=0)
     selected_dataset_df = select_dataset(selected_dataset_name)
 
