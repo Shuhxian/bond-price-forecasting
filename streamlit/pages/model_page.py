@@ -10,7 +10,7 @@ from azureml.core.workspace import Workspace
 from azureml.core.experiment import Experiment
 from azureml.train.automl.run import AutoMLRun
 
-def fetch_newest(fetch=False,csv='/streamlit/pages/exp.csv'):
+def fetch_newest(fetch=False,csv='/bond-price-forcasting/streamlit/pages/exp.csv'):
   if fetch:
     
     # get auth code
@@ -20,7 +20,7 @@ def fetch_newest(fetch=False,csv='/streamlit/pages/exp.csv'):
     service_principal_password="eE.ozUaf8ncZt8~5gID-A7X85g.7clQ.P6")
 
     # define workspace
-    WS = Workspace.from_config("/azureml-sdk-utils/config.json", auth=SVC_PR)
+    WS = Workspace.from_config("/bond-price-forcasting/streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
 
     experiments=[]
     run_ids=[]
