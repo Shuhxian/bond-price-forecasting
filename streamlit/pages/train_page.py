@@ -14,15 +14,15 @@ def app():
 
     ''' Allowing the user to select a dataset from Azure Datastore '''
     all_registered_datasets = show_all_registered_datasets()
-    selected_dataset_name = st.selectbox("Choose a dataset from Azure Datastore", all_registered_datasets, index=0)
-    selected_dataset_df = select_dataset(selected_dataset_name)
+    selected_dataset_name = st.selectbox("Choose a dataset from Azure Datastore", list(all_registered_datasets.keys()), index=0)
+    selected_dataset_df = select_dataset(selected_dataset_name, all_registered_datasets)
 
     ''' Allowing the user to select features to train on '''
     with st.expander("Featurization"):
-        clicked = st.button("Auto Feature Selection")
+        # clicked = st.button("Auto Feature Selection")
         selected_features = []
-        if clicked:
-            selected_features = auto_feature_selection(selected_dataset_df, "RFE", 10, "NEXT MONTH CHANGES IN EVAL MID PRICE", show_discard=False)
+        # if clicked:
+        #     selected_features = auto_feature_selection(selected_dataset_df, "RFE", 10, "NEXT MONTH CHANGES IN EVAL MID PRICE", show_discard=False)
         checked_box = {}
         for i, col in enumerate(selected_dataset_df.columns):
             selected = True
@@ -44,7 +44,7 @@ def app():
     ''' Show training process '''
     if submit_button:
         allowed_features = [feature_col for feature_col, allowed in checked_box.items() if allowed]
-        tabular_dataset = select_dataset(selected_dataset_name, to_pandas_dataframe=False)
+        tabular_dataset = select_dataset(selected_dataset_name, all_registered_datasets, to_pandas_dataframe=False)
         tabular_dataset = tabular_dataset.keep_columns(allowed_features)
         train_model(tabular_dataset, experiment_name, time_column_name, time_series_id_column_names, target_column_name, experiment_timeout_hours=experiment_timeout)
 

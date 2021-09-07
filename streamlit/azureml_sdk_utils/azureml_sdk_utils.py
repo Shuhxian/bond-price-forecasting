@@ -55,20 +55,17 @@ def upload_dataset(filename, df):
                                  create_new_version = True)
 
 # show all dataset names
-# @st.cache(suppress_st_warning=True, hash_funcs={queue.SimpleQueue: id})
-# @st.cache()
+# @st.cache(suppress_st_warning=True, hash_funcs={tuple: id})
 def show_all_registered_datasets():
-    return list(Dataset.get_all(WS).key())
+    return Dataset.get_all(WS)
     
 # select a dataset and convert it to pandas dataframe
-# @st.cache(suppress_st_warning=True, hash_funcs={queue.SimpleQueue: id})
-# @st.cache()
-def select_dataset(dataset_name, to_pandas_dataframe = True):
-    dataset = Dataset.get_by_name(WS, dataset_name, version='latest')
+# @st.cache(suppress_st_warning=True, hash_funcs={tuple: id})
+def select_dataset(dataset_name, all_datasets, to_pandas_dataframe = True):
     if to_pandas_dataframe:
-        return dataset.to_pandas_dataframe().reset_index(drop=True)
+        return all_datasets[dataset_name].take(10).to_pandas_dataframe().reset_index(drop=True)
     else:
-        return dataset
+        return all_datasets[dataset_name]
 
 # feature selection
 def manual_feature_selection(dataset_df, dropped_columns):
@@ -97,7 +94,7 @@ def auto_feature_selection(dataset_df, method, k, target_column_name, show_disca
         selector = ExtraTreesRegressor(n_estimators=100)
     else:
         print("Selection method not available.")
-        return df_normalized
+        return dataset_df
     fit = selector.fit(X, Y)
     cols=[]
     if method=="Extra_Trees":

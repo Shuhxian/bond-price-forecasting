@@ -1,5 +1,7 @@
 import streamlit as st
 import sys
+import os
+import pandas as pd
 # setting path
 sys.path.append('..\\azureml_sdk_utils')
 from azureml_sdk_utils.azureml_sdk_utils import *
@@ -28,8 +30,8 @@ def app():
 
     ''' Allowing the user to select a dataset from Azure Datastore '''
     all_registered_datasets = show_all_registered_datasets()
-    selected_dataset_name = st.selectbox("Choose a dataset from Azure Datastore", all_registered_datasets, index=0)
-    selected_dataset_df = select_dataset(selected_dataset_name)
+    selected_dataset_name = st.selectbox("Choose a dataset from Azure Datastore", list(all_registered_datasets.keys()), index=0)
+    selected_dataset_df = select_dataset(selected_dataset_name, all_registered_datasets)
     st.dataframe(selected_dataset_df.head(n=20))
 
     # Getting and displaying the original dataset from AML
