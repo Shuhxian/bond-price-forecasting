@@ -1,0 +1,13 @@
+Experiment,Model,Root Mean Squared Error
+mimic-lightBGM-13,StandardScaler+ElasticNet,0.0012261026886392517
+extra_trees_features_bond,StandardScaler+ElasticNet,0.002093454350598897
+KBest_bond,StandardScaler+ElasticNet,0.002095296943025265
+RFE_bond,StandardScaler+ElasticNet,0.0020962375957328835
+benchmark_bond_price_forecasting,StandardScaler+ElasticNet,0.0023381781667396457
+benchmark_bond_price_forecasting_AA_AAA_bonds,MinMaxScaler+RandomForestRegressor,0.3406599848253065
+mimic-lightGBM-13-AA-AAA-bonds,MinMaxScaler+RandomForestRegressor,0.3482352497784373
+mimic-lightGBM-13,MinMaxScaler+RandomForestRegressor,0.8806555173593162
+mimic-lightGBM-13-target-rolling-window,RobustScaler+RandomForestRegressor,0.9293412357250658
+bond_price_forcasting,ExponentialSmoothing,1.1274466925789637
+test,ExponentialSmoothing,1.1524992153005478
+mimic-lightGBM-14,ExponentialSmoothing,1.1533083865537597
