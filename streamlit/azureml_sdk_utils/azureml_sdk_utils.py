@@ -37,8 +37,8 @@ SVC_PR = ServicePrincipalAuthentication(
     service_principal_password="eE.ozUaf8ncZt8~5gID-A7X85g.7clQ.P6")
 
 # define workspace
-WS = Workspace.from_config("streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
-# WS = Workspace.from_config("azureml_sdk_utils/config.json", auth=SVC_PR)
+#WS = Workspace.from_config("streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
+WS = Workspace.from_config("azureml_sdk_utils/config.json", auth=SVC_PR)
 
 # define a compute_cluster
 amlcompute_cluster_name = "GigaBITS-compute"

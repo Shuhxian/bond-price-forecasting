@@ -20,7 +20,8 @@ def fetch_newest(fetch=False,csv='/bond-price-forcasting/streamlit/pages/exp.csv
     service_principal_password="eE.ozUaf8ncZt8~5gID-A7X85g.7clQ.P6")
 
     # define workspace
-    WS = Workspace.from_config("/bond-price-forcasting/streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
+    # WS = Workspace.from_config("/bond-price-forcasting/streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
+    WS = Workspace.from_config("azureml_sdk_utils/config.json", auth=SVC_PR)
 
     experiments=[]
     run_ids=[]
@@ -74,5 +75,6 @@ def fetch_newest(fetch=False,csv='/bond-price-forcasting/streamlit/pages/exp.csv
 def app():
     st.title('Model')
     st.write('Best model by experiment')
-    df=fetch_newest(False,'exp.csv')
+    # df=fetch_newest(False,'exp.csv')
+    df=fetch_newest(False,r'pages/exp.csv')
     st.write(df.head(10))
