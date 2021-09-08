@@ -37,8 +37,8 @@ SVC_PR = ServicePrincipalAuthentication(
     service_principal_password="eE.ozUaf8ncZt8~5gID-A7X85g.7clQ.P6")
 
 # define workspace
-#WS = Workspace.from_config("streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
-WS = Workspace.from_config("azureml_sdk_utils/config.json", auth=SVC_PR)
+WS = Workspace.from_config("streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
+# WS = Workspace.from_config("azureml_sdk_utils/config.json", auth=SVC_PR)
 
 # define a compute_cluster
 amlcompute_cluster_name = "GigaBITS-compute"
@@ -195,7 +195,7 @@ def train_model(dataset_df, experiment_name, time_column_name, time_series_id_co
     # widget to show
     # RunDetails(remote_run).show()
     # https://github.com/Azure/MachineLearningNotebooks/blob/master/how-to-use-azureml/automated-machine-learning/local-run-classification-credit-card-fraud/auto-ml-classification-credit-card-fraud-local.ipynb
-    remote_run.wait_for_completion()
+    # remote_run.wait_for_completion()
     return remote_run.get_output()
 
 def model_loss(experiment_name,run_id):
