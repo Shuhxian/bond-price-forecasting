@@ -79,6 +79,6 @@ def app():
     st.title('Model')
     st.write('Best model by experiment')
     # df=fetch_newest(False,'exp.csv')
-    df=fetch_newest(False,r'pages/exp.csv')
-    # df=fetch_newest(False,r'streamlit/pages/exp.csv')
+    # df=fetch_newest(False,r'pages/exp.csv')
+    df=fetch_newest(False,r'streamlit/pages/exp.csv')
     st.write(df.head(10))

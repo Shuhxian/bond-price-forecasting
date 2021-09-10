@@ -17,7 +17,7 @@ def app():
     uploaded_file = st.file_uploader("Choose a file", type=["xlsx","csv"])
     if uploaded_file is not None:
         filename, file_extension = os.path.splitext(uploaded_file.name)
-        if file_extension == "xlsx":
+        if file_extension in [".xlsx","xlsx"]:
             df = pd.read_excel(uploaded_file,  engine='openpyxl')
         else:
             df = pd.read_csv(uploaded_file)
