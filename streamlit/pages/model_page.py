@@ -9,13 +9,9 @@ from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.workspace import Workspace
 from azureml.core.experiment import Experiment
 from azureml.train.automl.run import AutoMLRun
-# import sys
-
-# sys.path.append('..\\')
 
 def fetch_newest(fetch=False,csv='/bond-price-forcasting/streamlit/pages/exp.csv'):
   if fetch:
-    
     # get auth code
     SVC_PR = ServicePrincipalAuthentication(
     tenant_id="a63bb1a9-48c2-448b-8693-3317b00ca7fb",
@@ -28,12 +24,17 @@ def fetch_newest(fetch=False,csv='/bond-price-forcasting/streamlit/pages/exp.csv
 
     experiments=[]
     run_ids=[]
+    #get a list of all experiments
     experiment_list=Experiment.list(WS)
+    
+    #get a list of all run ids for all experiments
     for experiment in experiment_list:
       run_list=experiment.get_runs(include_children=False)
       for run in run_list:
         experiments.append(experiment.name)
         run_ids.append(run.id)
+        
+    #get the best models for each experiment
     model_dict={}
     for i in range(len(experiments)):
       current=Experiment(WS, experiments[i])
@@ -43,7 +44,6 @@ def fetch_newest(fetch=False,csv='/bond-price-forcasting/streamlit/pages/exp.csv
         best_run, fitted_model = automl_run.get_output(include_children=True)
         metric=best_run.get_metrics()
         if 'root_mean_squared_error' in metric.keys():
-          #print(best_run.properties['pipeline_spec'])
           #Cannot convert to dict because of the way some metric is stored, dict in list in dict etc.
           model_names=re.findall('"class_name":\s*"(.{1,30})",\s*"module"',best_run.properties['pipeline_spec'])
           model_loss=metric['root_mean_squared_error']
@@ -52,9 +52,6 @@ def fetch_newest(fetch=False,csv='/bond-price-forcasting/streamlit/pages/exp.csv
             for model in model_names:
               model_name+="+"+model
             model_name=model_name[1:]
-            #print(experiments[i])
-            #print(model_name)
-            #print(model_loss)
             if experiments[i] in model_dict.keys():
               if model_name in model_dict[experiments[i]].keys():
                 if model_loss>model_dict[experiments[i]][model_name]:
@@ -65,6 +62,7 @@ def fetch_newest(fetch=False,csv='/bond-price-forcasting/streamlit/pages/exp.csv
       except:
         continue
 
+    #create a dataframe to show the results
     df=pd.DataFrame(columns={"Experiment","Model","Root Mean Squared Error"})
     for experiment, loss_dict in model_dict.items():
       for model, loss in loss_dict.items():

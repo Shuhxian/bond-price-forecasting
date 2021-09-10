@@ -47,8 +47,14 @@ COMPUTE_TARGET = ComputeTarget(workspace=WS, name=amlcompute_cluster_name)
 # load all dataset in first run
 ALL_REGISTERED_DATASETS = dict(Dataset.get_all(WS))
 
-# upload dataset
 def upload_dataset(filename, df):
+    """
+    Upload dataset
+    filename:str
+    The file name to be used.
+    df:dataframe
+    The dataset to be uploaded.
+    """
     df.to_csv(filename +".csv")
     datastore = WS.get_default_datastore()
     datastore.upload_files(files = [filename +".csv"], target_path = 'dataset/', overwrite = True,show_progress = True)
@@ -60,9 +66,11 @@ def upload_dataset(filename, df):
     # retrieve the latest dataset
     ALL_REGISTERED_DATASETS[filename] = dataset
   
-# select a dataset and convert it to pandas dataframe
 # @st.cache(suppress_st_warning=True, hash_funcs={tuple: id})
 def select_dataset(dataset_name, all_datasets, to_pandas_dataframe = True):
+    """
+    Select a dataset and convert it to pandas dataframe
+    """
     if to_pandas_dataframe:
         # print(type(all_datasets[dataset_name]))
         if isinstance(all_datasets[dataset_name], pd.DataFrame):
@@ -73,13 +81,15 @@ def select_dataset(dataset_name, all_datasets, to_pandas_dataframe = True):
     else:
         return Dataset.get_by_name(workspace = WS, name=dataset_name)
 
-# feature selection
 def manual_feature_selection(dataset_df, dropped_columns):
+    """
+    Feature selection done manually.
+    """
     return dataset_df.drop(dropped_columns)
-
-# modified from goy code  
+ 
 def auto_feature_selection(dataset_df, method, k, target_column_name, show_discard=False):
     """
+    Feature selection using predefined algorithms.
     df_normalized: df
     The normalized dataframe
     method: str
@@ -117,45 +127,63 @@ def auto_feature_selection(dataset_df, method, k, target_column_name, show_disca
 
     return cols+[target_column_name]
 
-# show a list of experiments
 def show_all_experiments():
+    """
+    Show a list of experiments
+    """
     return Experiment.list(WS)
 
-# select an experiment
 def select_experiment(experiment_name):
+    """
+    Select an experiment
+    """
     return Experiment(WS, experiment_name)
 
-# show a list of runs from an experiment
 def show_all_runs(experiment):
+    """
+    Show a list of runs from an experiment
+    """
     return experiment.get_runs(include_children=True)
 
-# select the best run in an experiment
 def select_best_run(experiment):
+    """
+    Select the best run in an experiment
+    """
     return experiment.get_runs(include_children=False)
 
-# show a list of registered models
 def show_all_models():
+    """
+    Show a list of registered models
+    """
     return Model.list(WS)
 
-# select a registered model
 def select_registered_model(model_name):
+    """
+    Select a registered model
+    """
     return Model(WS, model_name)
 
-# select the best model from an experiment
 def select_best_model(experiment, run_id, metric="root_mean_squared_error"):
+    """
+    Select the best model from an experiment
+    """
     automl_run = AutoMLRun(experiment, run_id = run_id)
     best_run, fitted_model = automl_run.get_output(metric=metric)
     print(fitted_model.steps)
     return fitted_model
 
-# make an inference with a model
 def make_inference(model, x_future, y_future):
+    """
+    Make an inference with a model
+    """
     model.quantiles = [0.05,0.5, 0.9] # provides the confidence interval
     result = model.forecast_quantiles(x_future, y_future)
     return result
 
-# evaluate test set with root mean squared error
 def evaluate_test_set(model, test_dataset, target_column):
+    """
+    Evaluate test set with root mean squared error
+    """
     test_dataset["VALUE DATE MONTH"] = test_dataset["VALUE DATE MONTH"].astype('datetime64[ns]')
     x_test = test_dataset.copy()
     y_test = x_test.pop(target_column).values
@@ -167,8 +195,10 @@ def evaluate_test_set(model, test_dataset, target_column):
     rmse = sqrt(mean_squared_error(result[target_column], result["_automl_target_col"]))
     return result, rmse
 
-# train a model on the cloud only 
 def train_model(dataset_df, experiment_name, time_column_name, time_series_id_column_names, target_column_name, experiment_timeout_hours=24):
+    """
+    Train a model on the cloud only 
+    """
     # create or retrieve experiment
     experiment = select_experiment(experiment_name)
     forecasting_parameters = ForecastingParameters(
