@@ -2,6 +2,7 @@ from altair.vegalite.v4.schema.channels import X2Value
 import streamlit as st
 import altair as alt
 import numpy as np
+import sys
 import pandas as pd
 from azureml.core.run import Run
 import re
@@ -9,6 +10,11 @@ from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.workspace import Workspace
 from azureml.core.experiment import Experiment
 from azureml.train.automl.run import AutoMLRun
+import time
+
+# setting path
+sys.path.append('..\\azureml_sdk_utils')
+from azureml_sdk_utils.azureml_sdk_utils import *
 
 def fetch_newest(fetch=False,csv='/bond-price-forcasting/streamlit/pages/exp.csv'):
   if fetch:
@@ -80,3 +86,19 @@ def app():
     df=fetch_newest(False,r'pages/exp.csv')
     # df=fetch_newest(False,r'streamlit/pages/exp.csv')
     st.write(df.head(10))
+    experiment_name = st.selectbox("Choose Experiment", df['Experiment'], index=0)
+    update = st.button('Update Webservice')
+
+    testing = True
+    if update:
+      if testing:
+        updating_text = st.empty()
+        updating_text.text('Updating...')
+        bar = st.progress(0)
+        for i in range(100):
+            # Update the progress bar with each iteration.
+            bar.progress(i + 1)
+            time.sleep(0.1)
+        updating_text.text('Webservice updated!')
+      else:
+        update_webservice(experiment_name)

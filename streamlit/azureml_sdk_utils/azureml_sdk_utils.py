@@ -1,3 +1,4 @@
+from hashlib import new
 import azureml.core
 import pandas as pd
 import logging
@@ -19,6 +20,10 @@ from azureml.widgets import RunDetails
 from azureml.core.run import Run
 from azureml.core.model import Model
 from azureml.train.automl.run import AutoMLRun
+from azureml.core.webservice import Webservice
+from azureml.core.model import Model, InferenceConfig
+from azureml.core.environment import Environment
+from azureml.automl.core.shared import constants
 
 from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_classif
@@ -37,8 +42,8 @@ SVC_PR = ServicePrincipalAuthentication(
     service_principal_password="eE.ozUaf8ncZt8~5gID-A7X85g.7clQ.P6")
 
 # define workspace
-WS = Workspace.from_config("streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
-# WS = Workspace.from_config("azureml_sdk_utils/config.json", auth=SVC_PR)
+# WS = Workspace.from_config("streamlit/azureml_sdk_utils/config.json", auth=SVC_PR)
+WS = Workspace.from_config("azureml_sdk_utils/config.json", auth=SVC_PR)
 
 # define a compute_cluster
 amlcompute_cluster_name = "GigaBITS-compute"
@@ -250,8 +255,45 @@ def model_loss(experiment_name,run_id):
             model_dict[model_name]=model_loss
     return model_dict
 
+def update_webservice(experiment_name='benchmark_bond_price_forecasting_AA_AAA_bonds'):
+    # Select best run
+    experiment = Experiment(WS, experiment_name)
+    run_list = experiment.get_runs(include_children=False)
+    for run in run_list:
+        if run.get_status() == 'Completed':
+            best_run, new_model = run.get_output()
+            model_name = best_run.properties["model_name"]
+            print(model_name)
+            new_model = run.register_model(model_name=model_name, description="webservice_update")
+            break
+
+    # Getting the env file
+    best_run.download_file(constants.CONDA_ENV_FILE_PATH, 'myenv.yml')
+    myenv = Environment.from_conda_specification(name="myenv", file_path="myenv.yml")
+
+    # Getting the inference file
+    script_file_name = 'inference/score.py'
+    best_run.download_file('outputs/scoring_file_v_1_0_0.py', 'inference/score.py')
+    inference_config = InferenceConfig(entry_script=script_file_name, environment=myenv)
+
+    # Retrieve existing service.
+    service_name = 'powerbi-test'
+    service = Webservice(name=service_name, workspace=WS)
+    #print(service)
+
+    # Update to new model(s).
+    service.update(models=[new_model], inference_config=inference_config)
+    service.wait_for_deployment(show_output=True)
+    #print(service.state)
+    #print(service.get_logs())
+
 
 # select_best_model(select_experiment("benchmark_bond_price_forecasting"),"AutoML_be919576-4584-4c93-a89c-91d9b7626971")
 # print(list(show_all_registered_datasets().keys()))
 # print(type(select_dataset("train_dataset_06092021", to_pandas_dataframe = False)))
 # print(show_all_experiments())
+
+if __name__=='__main__':
+    experiment_name = 'self-engineered-AA-AAA-bonds'
+    update_webservice(experiment_name)
+    
