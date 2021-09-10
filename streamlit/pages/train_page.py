@@ -45,50 +45,51 @@ def app():
         allowed_features = [feature_col for feature_col, allowed in checked_box.items() if allowed]
         tabular_dataset = select_dataset(selected_dataset_name, ALL_REGISTERED_DATASETS, to_pandas_dataframe=False)
         tabular_dataset = tabular_dataset.keep_columns(allowed_features)
-        train_model(tabular_dataset, experiment_name, time_column_name, time_series_id_column_names, target_column_name, experiment_timeout_hours=experiment_timeout)
-
+        portal_url = train_model(tabular_dataset, experiment_name, time_column_name, time_series_id_column_names, target_column_name, experiment_timeout_hours=experiment_timeout)
+        # st.markdown(f'<a href={portal_url}">Check Training Progress</a>')
+        st.write(f"Check Training Progress [link]({portal_url})")
         # Progress bar sample
-        training_text = st.empty()
-        training_text.text('Training...')
-        bar = st.progress(0)
-        for i in range(100):
-            # Update the progress bar with each iteration.
-            bar.progress(i + 1)
-            time.sleep(0.1)
-        training_text.text('Training completed!')
+        # training_text = st.empty()
+        # training_text.text('Training...')
+        # bar = st.progress(0)
+        # for i in range(100):
+        #     # Update the progress bar with each iteration.
+        #     bar.progress(i + 1)
+        #     time.sleep(0.1)
+        # training_text.text('Training completed!')
         
 
-        ''' Show graphs of accuracy and loss '''
-        st.markdown('## New Model')
-        col3, col4 = st.columns(2)
-        with col3:
-            st.write('Accuracy')
+        # ''' Show graphs of accuracy and loss '''
+        # st.markdown('## New Model')
+        # col3, col4 = st.columns(2)
+        # with col3:
+        #     st.write('Accuracy')
 
-            # Sample accuracy graph
-            x = np.arange(1,100)
-            source = pd.DataFrame({
-            'x': x,
-            'f(x)': np.log(x)*20
-            })
+        #     # Sample accuracy graph
+        #     x = np.arange(1,100)
+        #     source = pd.DataFrame({
+        #     'x': x,
+        #     'f(x)': np.log(x)*20
+        #     })
 
-            chart = alt.Chart(source).mark_line().encode(
-                x='x',
-                y='f(x)'
-            )
-            st.altair_chart(chart, use_container_width=True)
-        with col4:
-            st.write('Loss')
+        #     chart = alt.Chart(source).mark_line().encode(
+        #         x='x',
+        #         y='f(x)'
+        #     )
+        #     st.altair_chart(chart, use_container_width=True)
+        # with col4:
+        #     st.write('Loss')
 
-            # Sample accuracy graph
-            x = np.arange(1,100)
-            source = pd.DataFrame({
-            'x': x,
-            'f(x)': [1/i for i in x]
-            })
+        #     # Sample accuracy graph
+        #     x = np.arange(1,100)
+        #     source = pd.DataFrame({
+        #     'x': x,
+        #     'f(x)': [1/i for i in x]
+        #     })
 
-            chart = alt.Chart(source).mark_line().encode(
-                x='x',
-                y='f(x)'
-            )
-            st.altair_chart(chart, use_container_width=True)
+        #     chart = alt.Chart(source).mark_line().encode(
+        #         x='x',
+        #         y='f(x)'
+        #     )
+        #     st.altair_chart(chart, use_container_width=True)
 

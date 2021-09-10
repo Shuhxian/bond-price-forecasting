@@ -29,6 +29,7 @@ def app():
         st.button("Upload to Azure", on_click=upload_this_dataset)
 
     ''' Allowing the user to select a dataset from Azure Datastore '''
+    print(ALL_REGISTERED_DATASETS)
     selected_dataset_name = st.selectbox("Choose a dataset from Azure Datastore", list(ALL_REGISTERED_DATASETS.keys()), index=0)
     selected_dataset_df = select_dataset(selected_dataset_name, ALL_REGISTERED_DATASETS)
     st.dataframe(selected_dataset_df.head(n=20))

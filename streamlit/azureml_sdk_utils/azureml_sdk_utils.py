@@ -57,6 +57,8 @@ def upload_dataset(filename, df):
                                  name=filename,
                                  description='testing',
                                  create_new_version = True)
+    # retrieve the latest dataset
+    ALL_REGISTERED_DATASETS[filename] = dataset
   
 # select a dataset and convert it to pandas dataframe
 # @st.cache(suppress_st_warning=True, hash_funcs={tuple: id})
@@ -69,7 +71,7 @@ def select_dataset(dataset_name, all_datasets, to_pandas_dataframe = True):
         all_datasets[dataset_name] = all_datasets[dataset_name].take(10).to_pandas_dataframe().reset_index(drop=True)
         return all_datasets[dataset_name]
     else:
-        return all_datasets[dataset_name]
+        return Dataset.get_by_name(workspace = WS, name=dataset_name)
 
 # feature selection
 def manual_feature_selection(dataset_df, dropped_columns):
@@ -191,12 +193,14 @@ def train_model(dataset_df, experiment_name, time_column_name, time_series_id_co
                                 max_cores_per_iteration=-1,
                                 forecasting_parameters=forecasting_parameters)
     
-    remote_run = experiment.submit(automl_config, show_output=True)
+    remote_run = experiment.submit(automl_config, show_output=False)
+    return remote_run.get_portal_url()
+
     # widget to show
     # RunDetails(remote_run).show()
     # https://github.com/Azure/MachineLearningNotebooks/blob/master/how-to-use-azureml/automated-machine-learning/local-run-classification-credit-card-fraud/auto-ml-classification-credit-card-fraud-local.ipynb
     # remote_run.wait_for_completion()
-    return remote_run.get_output()
+    # return remote_run.get_output()
 
 def model_loss(experiment_name,run_id):
     """
