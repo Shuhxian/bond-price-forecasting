@@ -9,6 +9,9 @@ from azureml.core.authentication import ServicePrincipalAuthentication
 from azureml.core.workspace import Workspace
 from azureml.core.experiment import Experiment
 from azureml.train.automl.run import AutoMLRun
+# import sys
+
+# sys.path.append('..\\')
 
 def fetch_newest(fetch=False,csv='/bond-price-forcasting/streamlit/pages/exp.csv'):
   if fetch:
@@ -77,4 +80,5 @@ def app():
     st.write('Best model by experiment')
     # df=fetch_newest(False,'exp.csv')
     df=fetch_newest(False,r'pages/exp.csv')
+    # df=fetch_newest(False,r'streamlit/pages/exp.csv')
     st.write(df.head(10))
