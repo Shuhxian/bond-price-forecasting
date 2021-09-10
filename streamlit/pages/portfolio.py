@@ -7,7 +7,8 @@ def app():
 
     st.title('Portfolio')
     # Power BI report embedding
-    powerbi_url= '<iframe width="1200" height="675" src="https://app.powerbi.com/reportEmbed?reportId=1e40c81c-a1d5-42fb-a5f5-cfb3907f65f3&autoAuth=true&ctid=a63bb1a9-48c2-448b-8693-3317b00ca7fb&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXNvdXRoLWVhc3QtYXNpYS1yZWRpcmVjdC5hbmFseXNpcy53aW5kb3dzLm5ldC8ifQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>'
+    #powerbi_url= '<iframe width="1200" height="675" src="https://app.powerbi.com/reportEmbed?reportId=1e40c81c-a1d5-42fb-a5f5-cfb3907f65f3&autoAuth=true&ctid=a63bb1a9-48c2-448b-8693-3317b00ca7fb&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXNvdXRoLWVhc3QtYXNpYS1yZWRpcmVjdC5hbmFseXNpcy53aW5kb3dzLm5ldC8ifQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>'
+    powerbi_url= '<iframe width="1200" height="675" src="https://app.powerbi.com/reportEmbed?reportId=665bb88f-abf0-480b-9217-78dcc6c4f024&autoAuth=true&ctid=a63bb1a9-48c2-448b-8693-3317b00ca7fb&config=eyJjbHVzdGVyVXJsIjoiaHR0cHM6Ly93YWJpLXNvdXRoLWVhc3QtYXNpYS1yZWRpcmVjdC5hbmFseXNpcy53aW5kb3dzLm5ldC8ifQ%3D%3D" frameborder="0" allowFullScreen="true"></iframe>'
     st.markdown(powerbi_url,unsafe_allow_html=True)
 
     # Chart of bonds ordered by ratio in descending order
