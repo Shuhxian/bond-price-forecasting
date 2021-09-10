@@ -277,7 +277,7 @@ def update_webservice(experiment_name='benchmark_bond_price_forecasting_AA_AAA_b
     inference_config = InferenceConfig(entry_script=script_file_name, environment=myenv)
 
     # Retrieve existing service.
-    service_name = 'powerbi-test'
+    service_name = 'best-model'
     service = Webservice(name=service_name, workspace=WS)
     #print(service)
 
